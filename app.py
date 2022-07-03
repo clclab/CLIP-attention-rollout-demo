@@ -7,6 +7,8 @@ sys.path.append("CLIP_explainability/Transformer-MM-Explainability/")
 import torch
 import CLIP.clip as clip
 
+import spacy
+
 
 from clip_grounding.utils.image import pad_to_square
 from clip_grounding.datasets.png import (
@@ -21,6 +23,8 @@ clip.clip._MODELS = {
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model, preprocess = clip.load("ViT-B/32", device=device, jit=False)
+
+NER = spacy.load("en_core_web_sm")
 
 # Gradio Section:
 def run_demo(image, text):

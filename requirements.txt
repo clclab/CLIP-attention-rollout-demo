@@ -97,6 +97,7 @@ Shapely==1.8.2
 six==1.16.0
 sniffio==1.2.0
 soupsieve==2.3.2.post1
+spacy
 stack-data==0.3.0
 tangled-up-in-unicode==0.2.0
 termcolor==1.1.0
