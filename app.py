@@ -8,7 +8,6 @@ import torch
 import CLIP.clip as clip
 
 import spacy
-import en_core_web_sm
 
 
 from clip_grounding.utils.image import pad_to_square
@@ -25,8 +24,7 @@ clip.clip._MODELS = {
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model, preprocess = clip.load("ViT-B/32", device=device, jit=False)
 
-# nlp = spacy.load("en_core_web_sm")
-nlp = en_core_web_sm.load()
+nlp = spacy.load("en_core_web_sm")
 
 # Gradio Section:
 def run_demo(image, text):
