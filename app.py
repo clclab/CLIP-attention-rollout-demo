@@ -121,17 +121,7 @@ outputs_NER = ["highlight", gr.Gallery(type='pil', label="NER Entity explanation
 iface_NER = gr.Interface(fn=NER_demo,
                          inputs=inputs_NER,
                          outputs=outputs_NER,
-                         examples=[["example_images/London.png", "London Eye"],
-                                   ["example_images/London.png", "Big Ben"],
-                                   ["example_images/harrypotter.png", "Harry"],
-                                   ["example_images/harrypotter.png", "Hermione"],
-                                   ["example_images/harrypotter.png", "Ron"],
-                                   ["example_images/Amsterdam.png", "Amsterdam canal"],
-                                   ["example_images/Amsterdam.png", "Old buildings"],
-                                   ["example_images/Amsterdam.png", "Pink flowers"],
-                                   ["example_images/dogs_on_bed.png", "Two dogs"],
-                                   ["example_images/dogs_on_bed.png", "Book"],
-                                   ["example_images/dogs_on_bed.png", "Cat"]],
+                         examples=[["example_images/London.png", "In this image we see Big Ben and the London Eye, on both sides of the river Thames."]],
                         cache_examples=False)
 
 demo_tabs = gr.TabbedInterface([iface, iface_NER], ["Default", "NER"])
