@@ -82,10 +82,11 @@ def NER_demo(image, text):
     # for each named entity.
     highlighed_entities = []
     for ent in nlp(text).ents:
-        print(ent)
         ent_text = ent.text
         ent_label = ent.label_
-        highlighed_entities.append((ent_text, 1.0))
+        highlighed_entities.append((ent_text, ent_label))
+
+    print(highlighed_entities)
 
     return highlighed_entities
 
