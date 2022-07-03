@@ -27,7 +27,7 @@ clip.clip._MODELS = {
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model, preprocess = clip.load("ViT-B/32", device=device, jit=False)
 
-# nlp = spacy.load("en_core_web_sm")
+nlp = spacy.load("en_core_web_sm")
 
 # Gradio Section:
 def run_demo(image, text):
@@ -48,13 +48,13 @@ def run_demo(image, text):
 
     # Apply NER to extract named entities, and run the explainability method
     # for each named entity.
-    # highlighed_entities = []
-    # for ent in nlp(text).ents:
-    #     ent_text = ent.text
-    #     ent_label = ent.label_
-    #     highlighed_entities.append((ent_text, ent_label))
+    highlighed_entities = []
+    for ent in nlp(text).ents:
+        ent_text = ent.text
+        ent_label = ent.label_
+        highlighed_entities.append((ent_text, ent_label))
 
-    # print(highlighed_entities)
+    print(highlighed_entities)
 
     return overlapped, highlighted_text
 
