@@ -86,22 +86,18 @@ def NER_demo(image, text):
         ent_label = ent.label_
         highlighed_entities.append((ent_text, 1.0))
 
-    print(highlighed_entities)
-
     return highlighed_entities
 
-input_img = gr.inputs.Image(type='pil', label="Original Image")
-input_txt = "text"
-inputs = [input_img, input_txt]
+input_img_NER = gr.inputs.Image(type='pil', label="Original Image")
+input_txt_NER = "text"
+inputs_NER = [input_img_NER, input_txt_NER]
 
-outputs = ["highlight"]
+outputs_NER = ["text"]
 
 
 iface_NER = gr.Interface(fn=NER_demo,
-                     inputs=inputs,
-                     outputs=outputs,
-                     title="CLIP Grounding Explainability",
-                     description="A demonstration based on the Generic Attention-model Explainability method for Interpreting Bi-Modal Transformers by Chefer et al. (2021): https://github.com/hila-chefer/Transformer-MM-Explainability.",
+                     inputs=inputs_NER,
+                     outputs=outputs_NER,
                      examples=[["example_images/London.png", "London Eye"],
                                ["example_images/London.png", "Big Ben"],
                                ["example_images/harrypotter.png", "Harry"],
