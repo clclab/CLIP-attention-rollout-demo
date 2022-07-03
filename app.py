@@ -84,7 +84,7 @@ def NER_demo(image, text):
     for ent in nlp(text).ents:
         ent_text = ent.text
         ent_label = ent.label_
-        highlighed_entities.append((ent_text, ent_label))
+        highlighed_entities.append((ent_text, 1.0))
 
     print(highlighed_entities)
 
