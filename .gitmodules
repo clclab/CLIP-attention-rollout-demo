@@ -1,0 +1,3 @@
+[submodule "CLIP_explainability/Transformer-MM-Explainability"]
+	path = CLIP_explainability/Transformer-MM-Explainability
+	url = https://github.com/hila-chefer/Transformer-MM-Explainability.git
