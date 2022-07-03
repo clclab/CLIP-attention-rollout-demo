@@ -81,7 +81,7 @@ iface = gr.Interface(fn=run_demo,
 def add_label_to_img(img, label):
     img = ImageOps.expand(img, border=45, fill=(255,255,255))
     draw = ImageDraw.Draw(img)
-    draw.text((0,0), label, align="center")
+    draw.text((0,0), label, align="center", fill=(0, 0, 0))
 
     return img
 
