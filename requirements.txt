@@ -97,8 +97,8 @@ Shapely==1.8.2
 six==1.16.0
 sniffio==1.2.0
 soupsieve==2.3.2.post1
-spacy==3.0.0
-en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.0.0/en_core_web_sm-3.0.0.tar.gz
+spacy==2.2.4
+en_core_web_sm @ https://huggingface.co/spacy/en_core_web_sm/resolve/main/en_core_web_sm-any-py3-none-any.whl
 stack-data==0.3.0
 tangled-up-in-unicode==0.2.0
 termcolor==1.1.0
