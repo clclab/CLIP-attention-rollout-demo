@@ -78,10 +78,10 @@ iface = gr.Interface(fn=run_demo,
                                ["example_images/dogs_on_bed.png", "Cat"]])
 
 # NER demo:
-def add_label_to_img(img):
-    img = ImageOps.expand(img, border=10, fill=(255,255,255))
+def add_label_to_img(img, label):
+    img = ImageOps.expand(img, border=45, fill=(255,255,255))
     draw = ImageDraw.Draw(img)
-    draw.text((0,0),"Sample Text",(0,255,255))
+    draw.text((0,0), label, align="center")
 
     return img
 
@@ -101,7 +101,7 @@ def NER_demo(image, text):
     gallery_images = [overlapped]
     for ent_text, ent_label in highlighed_entities:
         overlapped_ent, highlighted_text_ent = run_demo(image, ent_text)
-        overlapped_ent_labelled = add_label_to_img(overlapped_ent)
+        overlapped_ent_labelled = add_label_to_img(overlapped_ent, ent_text)
 
         gallery_images.append(overlapped_ent_labelled)
 
