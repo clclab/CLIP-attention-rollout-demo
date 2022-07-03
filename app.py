@@ -85,4 +85,4 @@ iface = gr.Interface(fn=run_demo,
                                ["example_images/dogs_on_bed.png", "Cat"]])
 
 demo_tabs = gr.TabbedInterface([iface, iface], ["Default", "NER"])
-iface.launch(debug=True)
+demo_tabs.launch(debug=True)
