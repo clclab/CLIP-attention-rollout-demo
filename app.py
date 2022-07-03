@@ -82,7 +82,7 @@ def add_label_to_img(img):
     img = ImageOps.expand(img, border=10, fill=(255,255,255))
     draw = ImageDraw.Draw(img)
     font = ImageFont.truetype("FONTS/arial.ttf", 36)
-    draw.text((0,0),"Sample Text",(0,255,255),font=font)
+    draw.text((0,0),"Sample Text",(0,255,255))
 
     return img
 
@@ -96,8 +96,6 @@ def NER_demo(image, text):
         highlighed_entities.append((ent_text, ent_label))
 
     # As the default image, we run the default demo on the input image and text:
-    font = ImageFont.truetype("FONTS/arial.ttf", 36)
-
     overlapped, highlighted_text = run_demo(image, text)
 
     # Then, we run the demo for each of the named entities:
