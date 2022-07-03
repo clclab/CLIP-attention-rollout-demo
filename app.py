@@ -78,11 +78,14 @@ iface = gr.Interface(fn=run_demo,
                                ["example_images/dogs_on_bed.png", "Cat"]])
 
 # NER demo:
-def add_label_to_img(img, label):
+def add_label_to_img(img, label, add_entity_label=True):
     img = ImageOps.expand(img, border=45, fill=(255,255,255))
     draw = ImageDraw.Draw(img)
-    font = ImageFont.truetype("arial.ttf", 36)
-    draw.text((0,0), label, align="center", fill=(0, 0, 0), font=font)
+    font = ImageFont.truetype("arial.ttf", 24)
+    if add_entity_label:
+        draw.text((0,0), "Entity: " + str(label), align="center", fill=(0, 0, 0), font=font)
+    else:
+        draw.text((0,0), str(label), align="center", fill=(0, 0, 0), font=font)
 
     return img
 
@@ -99,7 +102,7 @@ def NER_demo(image, text):
     overlapped, highlighted_text = run_demo(image, text)
 
     # Then, we run the demo for each of the named entities:
-    gallery_images = [overlapped]
+    gallery_images = [add_label_to_img(overlapped, "Full explanation", add_entity_label=False)]
     for ent_text, ent_label in highlighed_entities:
         overlapped_ent, highlighted_text_ent = run_demo(image, ent_text)
         overlapped_ent_labelled = add_label_to_img(overlapped_ent, ent_text)
