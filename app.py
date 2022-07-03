@@ -83,4 +83,6 @@ iface = gr.Interface(fn=run_demo,
                                ["example_images/dogs_on_bed.png", "Two dogs"],
                                ["example_images/dogs_on_bed.png", "Book"],
                                ["example_images/dogs_on_bed.png", "Cat"]])
+
+demo_tabs = gr.TabbedInterface([iface, iface], ["Default", "NER"])
 iface.launch(debug=True)
