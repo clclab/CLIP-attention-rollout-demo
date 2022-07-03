@@ -10,7 +10,7 @@ import CLIP.clip as clip
 import spacy
 
 import os
-os.system('python -m spacy download en_core_web_sm')
+os.system('python3 -m spacy download en_core_web_sm')
 
 
 from clip_grounding.utils.image import pad_to_square
