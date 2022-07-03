@@ -110,7 +110,8 @@ iface_NER = gr.Interface(fn=NER_demo,
                                    ["example_images/Amsterdam.png", "Pink flowers"],
                                    ["example_images/dogs_on_bed.png", "Two dogs"],
                                    ["example_images/dogs_on_bed.png", "Book"],
-                                   ["example_images/dogs_on_bed.png", "Cat"]])
+                                   ["example_images/dogs_on_bed.png", "Cat"]],
+                        cache_examples=False)
 
 demo_tabs = gr.TabbedInterface([iface, iface_NER], ["Default", "NER"])
 demo_tabs.launch(debug=True)
