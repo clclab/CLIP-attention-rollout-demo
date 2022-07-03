@@ -81,7 +81,6 @@ iface = gr.Interface(fn=run_demo,
 def add_label_to_img(img):
     img = ImageOps.expand(img, border=10, fill=(255,255,255))
     draw = ImageDraw.Draw(img)
-    font = ImageFont.truetype("FONTS/arial.ttf", 36)
     draw.text((0,0),"Sample Text",(0,255,255))
 
     return img
