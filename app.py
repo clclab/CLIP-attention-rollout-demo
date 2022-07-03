@@ -8,6 +8,7 @@ import torch
 import CLIP.clip as clip
 
 import spacy
+from PIL import Image, ImageFont, ImageDraw, ImageOps
 
 import os
 os.system('python -m spacy download en_core_web_sm')
@@ -77,6 +78,14 @@ iface = gr.Interface(fn=run_demo,
                                ["example_images/dogs_on_bed.png", "Cat"]])
 
 # NER demo:
+def add_label_to_img(img):
+    img = ImageOps.expand(img, border=10, fill=(255,255,255))
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.truetype("FONTS/arial.ttf", 36)
+    draw.text((0,0),"Sample Text",(0,255,255),font=font)
+
+    return img
+
 def NER_demo(image, text):
     # Apply NER to extract named entities, and run the explainability method
     # for each named entity.
@@ -87,13 +96,17 @@ def NER_demo(image, text):
         highlighed_entities.append((ent_text, ent_label))
 
     # As the default image, we run the default demo on the input image and text:
+    font = ImageFont.truetype("FONTS/arial.ttf", 36)
+
     overlapped, highlighted_text = run_demo(image, text)
 
     # Then, we run the demo for each of the named entities:
-    gallery_images = [(overlapped, "Default explanation")]
+    gallery_images = [overlapped]
     for ent_text, ent_label in highlighed_entities:
         overlapped_ent, highlighted_text_ent = run_demo(image, ent_text)
-        gallery_images.append((overlapped_ent, ent_text))
+        overlapped_ent_labelled = add_label_to_img(overlapped_ent)
+
+        gallery_images.append(overlapped_ent_labelled)
 
     return highlighed_entities, gallery_images
 
