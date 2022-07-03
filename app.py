@@ -86,15 +86,22 @@ def NER_demo(image, text):
         ent_label = ent.label_
         highlighed_entities.append((ent_text, ent_label))
 
-    print(highlighed_entities)
+    # As the default image, we run the default demo on the input image and text:
+    overlapped, highlighted_text = run_demo(image, text)
 
-    return highlighed_entities
+    # Then, we run the demo for each of the named entities:
+    gallery_images = [overlapped]
+    for ent_text, ent_label in highlighed_entities:
+        overlapped_ent, highlighted_text_ent = run_demo(image, ent_text)
+        gallery_images.append(overlapped_ent)
+
+    return highlighed_entities, gallery_images
 
 input_img_NER = gr.inputs.Image(type='pil', label="Original Image")
 input_txt_NER = "text"
 inputs_NER = [input_img_NER, input_txt_NER]
 
-outputs_NER = ["highlight"]
+outputs_NER = ["highlight", gr.Gallery(type='pil', label="NER Entity explanations")]
 
 
 iface_NER = gr.Interface(fn=NER_demo,
