@@ -48,18 +48,10 @@ def run_demo(image, text):
     for i, token in enumerate(text_tokens_decoded):
         highlighted_text.append((str(token), float(text_scores[i])))
 
-    # Apply NER to extract named entities, and run the explainability method
-    # for each named entity.
-    highlighed_entities = []
-    for ent in nlp(text).ents:
-        ent_text = ent.text
-        ent_label = ent.label_
-        highlighed_entities.append((ent_text, ent_label))
-
-    print(highlighed_entities)
-
     return overlapped, highlighted_text
 
+
+# Default demo:
 input_img = gr.inputs.Image(type='pil', label="Original Image")
 input_txt = "text"
 inputs = [input_img, input_txt]
@@ -84,5 +76,44 @@ iface = gr.Interface(fn=run_demo,
                                ["example_images/dogs_on_bed.png", "Book"],
                                ["example_images/dogs_on_bed.png", "Cat"]])
 
-demo_tabs = gr.TabbedInterface([iface, iface], ["Default", "NER"])
+# NER demo:
+def NER_demo(image, text):
+    # Apply NER to extract named entities, and run the explainability method
+    # for each named entity.
+    highlighed_entities = []
+    for ent in nlp(text).ents:
+        ent_text = ent.text
+        ent_label = ent.label_
+        highlighed_entities.append((ent_text, ent_label))
+
+    print(highlighed_entities)
+
+    return highlighed_entities
+
+input_img = gr.inputs.Image(type='pil', label="Original Image")
+input_txt = "text"
+inputs = [input_img, input_txt]
+
+outputs = ["highlight"]
+
+
+iface_NER = gr.Interface(fn=NER_demo,
+                     inputs=inputs,
+                     outputs=outputs,
+                     title="CLIP Grounding Explainability",
+                     description="A demonstration based on the Generic Attention-model Explainability method for Interpreting Bi-Modal Transformers by Chefer et al. (2021): https://github.com/hila-chefer/Transformer-MM-Explainability.",
+                     examples=[["example_images/London.png", "London Eye"],
+                               ["example_images/London.png", "Big Ben"],
+                               ["example_images/harrypotter.png", "Harry"],
+                               ["example_images/harrypotter.png", "Hermione"],
+                               ["example_images/harrypotter.png", "Ron"],
+                               ["example_images/Amsterdam.png", "Amsterdam canal"],
+                               ["example_images/Amsterdam.png", "Old buildings"],
+                               ["example_images/Amsterdam.png", "Pink flowers"],
+                               ["example_images/dogs_on_bed.png", "Two dogs"],
+                               ["example_images/dogs_on_bed.png", "Book"],
+                               ["example_images/dogs_on_bed.png", "Cat"]])
+
+
+demo_tabs = gr.TabbedInterface([iface, iface_NER], ["Default", "NER"])
 demo_tabs.launch(debug=True)
