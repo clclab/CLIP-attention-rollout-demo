@@ -94,7 +94,7 @@ input_img_NER = gr.inputs.Image(type='pil', label="Original Image")
 input_txt_NER = "text"
 inputs_NER = [input_img_NER, input_txt_NER]
 
-outputs_NER = ["text"]
+outputs_NER = ["highlight"]
 
 
 iface_NER = gr.Interface(fn=NER_demo,
@@ -111,7 +111,6 @@ iface_NER = gr.Interface(fn=NER_demo,
                                    ["example_images/dogs_on_bed.png", "Two dogs"],
                                    ["example_images/dogs_on_bed.png", "Book"],
                                    ["example_images/dogs_on_bed.png", "Cat"]])
-
 
 demo_tabs = gr.TabbedInterface([iface, iface_NER], ["Default", "NER"])
 demo_tabs.launch(debug=True)
