@@ -63,7 +63,7 @@ outputs = [gr.inputs.Image(type='pil', label="Output Image"), "highlight"]
 description = """A demonstration based on the Generic Attention-model Explainability method for Interpreting Bi-Modal
                  Transformers by Chefer et al. (2021): https://github.com/hila-chefer/Transformer-MM-Explainability.
                  <br> <br>
-                 This demo shows attributions scores on both the image and the text input when presented CLIP with a
+                 This demo shows attributions scores on both the image and the text input when presenting CLIP with a
                  <text,image> pair. Attributions are computed as Gradient-weighted Attention Rollout (Chefer et al.,
                  2021), and can be thought of as an estimate of the effective attention CLIP pays to its input when
                  computing a multimodal representation."""
