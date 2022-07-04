@@ -148,5 +148,8 @@ with demo_tabs:
                 This demo was developed for the Interpretability & Explainability in AI course at the University of
                 Amsterdam. We would like express our thanks to Jelle Zuidema, Jaap Jumelet, Tom Kersten, Christos
                 Athanasiadis, Peter Heemskerk, Zhi Zhang, and all the other TAs who helped us during this course.
+
+                ---
+                ### References
                 """)
 demo_tabs.launch(show_error=True)
