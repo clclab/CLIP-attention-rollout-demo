@@ -137,4 +137,7 @@ iface_NER = gr.Interface(fn=NER_demo,
                          cache_examples=False)
 
 demo_tabs = gr.TabbedInterface([iface, iface_NER], ["Default", "NER"])
+
+with demo_tabs:
+    gr.Markdown("Text markdown.")
 demo_tabs.launch(show_error=True)
