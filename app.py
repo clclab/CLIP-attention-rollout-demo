@@ -151,8 +151,8 @@ with demo_tabs:
 
                 ---
                 ### References
-                \[1\]: Chefer, H., Gur, S., & Wolf, L. (2021). Generic attention-model explainability for interpreting bi-modal and encoder-decoder transformers. In Proceedings of the IEEE/CVF International Conference on Computer Vision (pp. 397-406).
-                \[2\]: Abnar, S., & Zuidema, W. (2020). Quantifying attention flow in transformers. arXiv preprint arXiv:2005.00928.
-                \[3\]: https://samiraabnar.github.io/articles/2020-04/attention_flow
+                \[1\]: Chefer, H., Gur, S., & Wolf, L. (2021). Generic attention-model explainability for interpreting bi-modal and encoder-decoder transformers. In Proceedings of the IEEE/CVF International Conference on Computer Vision (pp. 397-406). <br>
+                \[2\]: Abnar, S., & Zuidema, W. (2020). Quantifying attention flow in transformers. arXiv preprint arXiv:2005.00928. <br>
+                \[3\]: https://samiraabnar.github.io/articles/2020-04/attention_flow <br>
                 """)
 demo_tabs.launch(show_error=True)
