@@ -137,4 +137,4 @@ iface_NER = gr.Interface(fn=NER_demo,
                          cache_examples=False)
 
 demo_tabs = gr.TabbedInterface([iface, iface_NER], ["Default", "NER"])
-demo_tabs.launch(debug=True)
+demo_tabs.launch(show_error=True)
