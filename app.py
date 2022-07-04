@@ -83,7 +83,7 @@ def add_label_to_img(img, label, add_entity_label=True):
     draw = ImageDraw.Draw(img)
     font = ImageFont.truetype("arial.ttf", 24)
     if add_entity_label:
-        draw.text((0,0), "Entity: " + str(label), align="center", fill=(0, 0, 0), font=font)
+        draw.text((0,0), f"Entity: {str(label)}" , align="center", fill=(0, 0, 0), font=font)
     else:
         draw.text((0,0), str(label), align="center", fill=(0, 0, 0), font=font)
 
@@ -105,7 +105,7 @@ def NER_demo(image, text):
     gallery_images = [add_label_to_img(overlapped, "Full explanation", add_entity_label=False)]
     for ent_text, ent_label in highlighed_entities:
         overlapped_ent, highlighted_text_ent = run_demo(image, ent_text)
-        overlapped_ent_labelled = add_label_to_img(overlapped_ent, ent_text)
+        overlapped_ent_labelled = add_label_to_img(overlapped_ent, f"{str(ent_text)} ({str(ent_label)})")
 
         gallery_images.append(overlapped_ent_labelled)
 
@@ -122,7 +122,7 @@ iface_NER = gr.Interface(fn=NER_demo,
                          inputs=inputs_NER,
                          outputs=outputs_NER,
                          examples=[["example_images/London.png", "In this image we see Big Ben and the London Eye, on both sides of the river Thames."]],
-                        cache_examples=False)
+                         cache_examples=False)
 
 demo_tabs = gr.TabbedInterface([iface, iface_NER], ["Default", "NER"])
 demo_tabs.launch(debug=True)
