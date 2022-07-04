@@ -60,11 +60,18 @@ inputs = [input_img, input_txt]
 outputs = [gr.inputs.Image(type='pil', label="Output Image"), "highlight"]
 
 
+description = """A demonstration based on the Generic Attention-model Explainability method for Interpreting Bi-Modal
+                 Transformers by Chefer et al. (2021): https://github.com/hila-chefer/Transformer-MM-Explainability. \n \n
+                 This demo shows attributions scores on both the image and the text input when presented CLIP with a
+                 <text,image> pair. Attributions are computed as Gradient-weighted Attention Rollout (Chefer et al.,
+                 2021), and can be thought of as an estimate of the effective attention CLIP pays to its input when
+                 computing a multimodal representation"""
+
 iface = gr.Interface(fn=run_demo,
                      inputs=inputs,
                      outputs=outputs,
                      title="CLIP Grounding Explainability",
-                     description="A demonstration based on the Generic Attention-model Explainability method for Interpreting Bi-Modal Transformers by Chefer et al. (2021): https://github.com/hila-chefer/Transformer-MM-Explainability.",
+                     description=description,
                      examples=[["example_images/London.png", "London Eye"],
                                ["example_images/London.png", "Big Ben"],
                                ["example_images/harrypotter.png", "Harry"],
@@ -121,6 +128,7 @@ outputs_NER = ["highlight", gr.Gallery(type='pil', label="NER Entity explanation
 iface_NER = gr.Interface(fn=NER_demo,
                          inputs=inputs_NER,
                          outputs=outputs_NER,
+                         title="Named Entity Grounding explainability using CLIP",
                          examples=[["example_images/London.png", "In this image we see Big Ben and the London Eye, on both sides of the river Thames."]],
                          cache_examples=False)
 
