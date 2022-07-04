@@ -128,7 +128,9 @@ inputs_NER = [input_img_NER, input_txt_NER]
 outputs_NER = ["highlight", gr.Gallery(type='pil', label="NER Entity explanations")]
 
 description_NER = """Automatically generated CLIP grounding explanations for
-                     named entities, retrieved from the spacy NER model."""
+                     named entities, retrieved from the spacy NER model. <span style="color:red">Warning:</span> Note
+                     that attribution methods such as the one from this demo can only give an estimate of the real
+                     underlying behavior of the model."""
 
 iface_NER = gr.Interface(fn=NER_demo,
                          inputs=inputs_NER,
