@@ -91,9 +91,9 @@ def add_label_to_img(img, label, add_entity_label=True):
     draw = ImageDraw.Draw(img)
     font = ImageFont.truetype("arial.ttf", 24)
     if add_entity_label:
-        draw.text((0,0), f"Entity: {str(label)}" , align="center", fill=(0, 0, 0), font=font)
+        draw.text((5,5), f"Entity: {str(label)}" , align="center", fill=(0, 0, 0), font=font)
     else:
-        draw.text((0,0), str(label), align="center", fill=(0, 0, 0), font=font)
+        draw.text((5,5), str(label), align="center", fill=(0, 0, 0), font=font)
 
     return img
 
