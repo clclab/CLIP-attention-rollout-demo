@@ -1,3 +1,4 @@
+import re
 import sys
 import gradio as gr
 
@@ -24,6 +25,28 @@ clip.clip._MODELS = {
     "ViT-B/32": "https://openaipublic.azureedge.net/clip/models/40d365715913c9da98579312b702a82c18be219cc2a73407c4526f58eba950af/ViT-B-32.pt",
     "ViT-B/16": "https://openaipublic.azureedge.net/clip/models/5806e77cd80f8b59890b7e101eabd078d9fb84e6937f9e85e4ecb61988df416f/ViT-B-16.pt",
 }
+
+colour_map = {
+        "N": "#f77189",
+        "CARDINAL": "#f7764a",
+        "DATE": "#d98a32",
+        "EVENT": "#bf9632",
+        "FAC": "#a99e31",
+        "GPE": "#90a531",
+        "LANGUAGE": "#68ad31",
+        "LAW": "#32b25e",
+        "LOC": "#34af86",
+        "MONEY": "#35ae9c",
+        "NORP": "#36acac",
+        "ORDINAL": "#37aabd",
+        "ORG": "#39a7d4",
+        "PERCENT": "#539ff4",
+        "PERSON": "#9890f4",
+        "PRODUCT": "#c47ef4",
+        "QUANTITY": "#ef5ff4",
+        "TIME": "#f565d0",
+        "WORK_OF_ART": "#f66baf",
+    }
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model, preprocess = clip.load("ViT-B/32", device=device, jit=False)
@@ -53,11 +76,16 @@ def run_demo(image, text):
 
 
 # Default demo:
-input_img = gr.inputs.Image(type='pil', label="Original Image")
-input_txt = "text"
-inputs = [input_img, input_txt]
 
-outputs = [gr.inputs.Image(type='pil', label="Output Image"), "highlight"]
+default_inputs = [
+        gr.components.Image(type='pil', label="Original Image"),
+        gr.components.Textbox(label="Image description"),
+    ]
+
+default_outputs = [
+        gr.components.Image(type='pil', label="Output Image"),
+        gr.components.HighlightedText(label="Text importance"),
+    ]
 
 
 description = """This demo is a copy of the demo CLIPGroundingExlainability built by Paul Hilders, Danilo de Goede and Piyush Bagad, as part of the course Interpretability and Explainability in AI (MSc AI, UvA, June 2022).
@@ -70,8 +98,8 @@ description = """This demo is a copy of the demo CLIPGroundingExlainability buil
                  of the model."""
 
 iface = gr.Interface(fn=run_demo,
-                     inputs=inputs,
-                     outputs=outputs,
+                     inputs=default_inputs,
+                     outputs=default_outputs,
                      title="CLIP Grounding Explainability",
                      description=description,
                      examples=[["example_images/London.png", "London Eye"],
@@ -91,40 +119,58 @@ def add_label_to_img(img, label, add_entity_label=True):
     img = ImageOps.expand(img, border=45, fill=(255,255,255))
     draw = ImageDraw.Draw(img)
     font = ImageFont.truetype("arial.ttf", 24)
-    if add_entity_label:
-        draw.text((5,5), f"Entity: {str(label)}" , align="center", fill=(0, 0, 0), font=font)
+    m = re.match(r".*\((\w+)\)", label)
+    if add_entity_label and m is not None:
+        cat = m.group(1)
+        colours = tuple(map(lambda l: int(''.join(l),16), zip(*[iter(colour_map[cat][1:])]*2)))
+
+        draw.text((5,5), label , align="center", fill=colours, font=font)
     else:
-        draw.text((5,5), str(label), align="center", fill=(0, 0, 0), font=font)
+        draw.text((5,5), label, align="center", fill=(0, 0, 0), font=font)
 
     return img
 
 def NER_demo(image, text):
-    # Apply NER to extract named entities, and run the explainability method
-    # for each named entity.
-    highlighed_entities = []
-    for ent in nlp(text).ents:
-        ent_text = ent.text
-        ent_label = ent.label_
-        highlighed_entities.append((ent_text, ent_label))
-
     # As the default image, we run the default demo on the input image and text:
     overlapped, highlighted_text = run_demo(image, text)
 
-    # Then, we run the demo for each of the named entities:
-    gallery_images = [add_label_to_img(overlapped, "Full explanation", add_entity_label=False)]
-    for ent_text, ent_label in highlighed_entities:
-        overlapped_ent, highlighted_text_ent = run_demo(image, ent_text)
-        overlapped_ent_labelled = add_label_to_img(overlapped_ent, f"{str(ent_text)} ({str(ent_label)})")
+    gallery_images = [add_label_to_img(overlapped, "Complete sentence", add_entity_label=False)]
 
-        gallery_images.append(overlapped_ent_labelled)
+    labeled_text = dict(
+            text=text,
+            entities=[],
+        )
 
-    return highlighed_entities, gallery_images
+    # Then, we run the demo for each of the noun chunks in the text:
+    for chunk in nlp(text).noun_chunks:
+        if len(chunk) == 1 and chunk[0].pos_ == "PRON":
+            continue
+        chunk_text = chunk.text
+        chunk_label = None
+        for t in chunk:
+            if t.ent_type_ != '':
+                chunk_label = t.ent_type_
+                break
+        if chunk_label is None:
+            chunk_label = "N"
 
-input_img_NER = gr.inputs.Image(type='pil', label="Original Image")
-input_txt_NER = "text"
-inputs_NER = [input_img_NER, input_txt_NER]
+        labeled_text['entities'].append({'entity': chunk_label, 'start': chunk.start_char, 'end': chunk.end_char})
+        overlapped, highlighted_text = run_demo(image, chunk_text)
+        overlapped_labelled = add_label_to_img(overlapped, f"{chunk_text} ({chunk_label})")
+        gallery_images.append(overlapped_labelled)
 
-outputs_NER = ["highlight", gr.Gallery(type='pil', label="NER Entity explanations")]
+    return labeled_text, gallery_images
+
+inputs_NER = [
+        gr.Image(type='pil', label="Original Image"),
+        gr.components.Textbox(label="Descriptive text"),
+    ]
+
+#colours = highlighter._style["color_map"]
+outputs_NER = [
+        gr.components.HighlightedText(show_legend=True, color_map=colour_map, label="Noun chunks"),
+        gr.components.Gallery(type='pil', label="NER Entity explanations")
+    ]
 
 description_NER = """Automatically generated CLIP grounding explanations for
                      named entities, retrieved from the spacy NER model. <span style="color:red">Warning:</span> Note
@@ -136,7 +182,10 @@ iface_NER = gr.Interface(fn=NER_demo,
                          outputs=outputs_NER,
                          title="Named Entity Grounding explainability using CLIP",
                          description=description_NER,
-                         examples=[["example_images/London.png", "In this image we see Big Ben and the London Eye, on both sides of the river Thames."]],
+                         examples=[
+                             ["example_images/London.png", "In this image we see Big Ben and the London Eye, on both sides of the river Thames."],
+                             ["example_images/harrypotter.png", "Hermione, Harry and Ron in their school uniform"],
+                             ],
                          cache_examples=False)
 
 demo_tabs = gr.TabbedInterface([iface, iface_NER], ["Default", "NER"])
