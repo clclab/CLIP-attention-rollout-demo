@@ -11,10 +11,6 @@ import CLIP.clip as clip
 import spacy
 from PIL import Image, ImageFont, ImageDraw, ImageOps
 
-import os
-os.system('python -m spacy download en_core_web_sm')
-
-
 from clip_grounding.utils.image import pad_to_square
 from clip_grounding.datasets.png import (
     overlay_relevance_map_on_image,
