@@ -47,14 +47,15 @@ colour_map = {
     }
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-model, preprocess = clip.load("ViT-B/32", device=device, jit=False)
 
 # nlp = spacy.load("en_core_web_sm")
 import en_core_web_sm
 nlp = en_core_web_sm.load()
 
 # Gradio Section:
-def run_demo(image, text):
+def run_demo(model_name, image, text):
+
+    model, preprocess = clip.load(model_name, device=device, jit=False)
     orig_image = pad_to_square(image)
     img = preprocess(orig_image).unsqueeze(0).to(device)
     text_input = clip.tokenize([text]).to(device)
@@ -76,6 +77,7 @@ def run_demo(image, text):
 # Default demo:
 
 default_inputs = [
+        gr.Dropdown(label="CLIP Model", choices=['ViT-B/16', 'ViT-B/32', 'ViT-L/14'], value="ViT-L/14"),
         gr.components.Image(type='pil', label="Original Image"),
         gr.components.Textbox(label="Image description"),
     ]
@@ -100,17 +102,17 @@ iface = gr.Interface(fn=run_demo,
                      outputs=default_outputs,
                      title="CLIP Grounding Explainability",
                      description=description,
-                     examples=[["example_images/London.png", "London Eye"],
-                               ["example_images/London.png", "Big Ben"],
-                               ["example_images/harrypotter.png", "Harry"],
-                               ["example_images/harrypotter.png", "Hermione"],
-                               ["example_images/harrypotter.png", "Ron"],
-                               ["example_images/Amsterdam.png", "Amsterdam canal"],
-                               ["example_images/Amsterdam.png", "Old buildings"],
-                               ["example_images/Amsterdam.png", "Pink flowers"],
-                               ["example_images/dogs_on_bed.png", "Two dogs"],
-                               ["example_images/dogs_on_bed.png", "Book"],
-                               ["example_images/dogs_on_bed.png", "Cat"]])
+                     examples=[[None, "example_images/London.png", "London Eye"],
+                               [None, "example_images/London.png", "Big Ben"],
+                               [None, "example_images/harrypotter.png", "Harry"],
+                               [None, "example_images/harrypotter.png", "Hermione"],
+                               [None, "example_images/harrypotter.png", "Ron"],
+                               [None, "example_images/Amsterdam.png", "Amsterdam canal"],
+                               [None, "example_images/Amsterdam.png", "Old buildings"],
+                               [None, "example_images/Amsterdam.png", "Pink flowers"],
+                               [None, "example_images/dogs_on_bed.png", "Two dogs"],
+                               [None, "example_images/dogs_on_bed.png", "Book"],
+                               [None, "example_images/dogs_on_bed.png", "Cat"]])
 
 # NER demo:
 def add_label_to_img(img, label, add_entity_label=True):
@@ -160,6 +162,7 @@ def NER_demo(image, text):
     return labeled_text, gallery_images
 
 inputs_NER = [
+        gr.Dropdown(label="CLIP Model", choices=['ViT-B/16', 'ViT-B/32', 'ViT-L/14'], value="ViT-L/14"),
         gr.Image(type='pil', label="Original Image"),
         gr.components.Textbox(label="Descriptive text"),
     ]
@@ -181,8 +184,8 @@ iface_NER = gr.Interface(fn=NER_demo,
                          title="Named Entity Grounding explainability using CLIP",
                          description=description_NER,
                          examples=[
-                             ["example_images/London.png", "In this image we see Big Ben and the London Eye, on both sides of the river Thames."],
-                             ["example_images/harrypotter.png", "Hermione, Harry and Ron in their school uniform"],
+                             [None, "example_images/London.png", "In this image we see Big Ben and the London Eye, on both sides of the river Thames."],
+                             [None, "example_images/harrypotter.png", "Hermione, Harry and Ron in their school uniform"],
                              ],
                          cache_examples=False)
 
