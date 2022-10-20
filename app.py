@@ -58,7 +58,7 @@ def run_demo(*args):
         image, text, model_name = args
     elif len(args) == 2:
         image, text = args
-        model_name = "ViT-L/14"
+        model_name = "ViT-B/32"
     else:
         raise ValueError("Unexpected number of parameters")
 
@@ -86,7 +86,7 @@ def run_demo(*args):
 default_inputs = [
         gr.components.Image(type='pil', label="Original Image"),
         gr.components.Textbox(label="Image description"),
-        gr.Dropdown(label="CLIP Model", choices=['ViT-B/16', 'ViT-B/32', 'ViT-L/14'], value="ViT-L/14"),
+        gr.Dropdown(label="CLIP Model", choices=['ViT-B/16', 'ViT-B/32', 'ViT-L/14'], value="ViT-B/32"),
     ]
 
 default_outputs = [
