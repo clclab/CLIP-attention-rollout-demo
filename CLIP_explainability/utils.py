@@ -78,9 +78,11 @@ def show_image_relevance(image_relevance, image, orig_image, device):
         cam = cam / np.max(cam)
         return cam
 
-    image_relevance = image_relevance.reshape(1, 1, 7, 7)
-    image_relevance = torch.nn.functional.interpolate(image_relevance, size=224, mode='bilinear')
-    image_relevance = image_relevance.reshape(224, 224).to(device).data.cpu().numpy()
+    rel_shp = np.sqrt(image_relevance.shape[0]).astype(int)
+    img_size = image.shape[-1]
+    image_relevance = image_relevance.reshape(1, 1, rel_shp, rel_shp)
+    image_relevance = torch.nn.functional.interpolate(image_relevance, size=img_size, mode='bilinear')
+    image_relevance = image_relevance.reshape(img_size, img_size).data.cpu().numpy()
     image_relevance = (image_relevance - image_relevance.min()) / (image_relevance.max() - image_relevance.min())
     image = image[0].permute(1, 2, 0).data.cpu().numpy()
     image = (image - image.min()) / (image.max() - image.min())
