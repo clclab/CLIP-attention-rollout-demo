@@ -138,9 +138,10 @@ def add_label_to_img(img, label, add_entity_label=True):
 
     return img
 
-def NER_demo(image, text):
+def NER_demo(image, text, model_name):
+
     # As the default image, we run the default demo on the input image and text:
-    overlapped, highlighted_text = run_demo(image, text)
+    overlapped, highlighted_text = run_demo(image, text, model_name)
 
     gallery_images = [add_label_to_img(overlapped, "Complete sentence", add_entity_label=False)]
 
@@ -163,7 +164,7 @@ def NER_demo(image, text):
             chunk_label = "N"
 
         labeled_text['entities'].append({'entity': chunk_label, 'start': chunk.start_char, 'end': chunk.end_char})
-        overlapped, highlighted_text = run_demo(image, chunk_text)
+        overlapped, highlighted_text = run_demo(image, chunk_text, model_name)
         overlapped_labelled = add_label_to_img(overlapped, f"{chunk_text} ({chunk_label})")
         gallery_images.append(overlapped_labelled)
 
