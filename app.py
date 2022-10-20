@@ -59,10 +59,10 @@ def run_demo(image, text):
 
     R_text, R_image = interpret(model=model, image=img, texts=text_input, device=device)
 
-    image_relevance = show_img_heatmap(R_image[0], img, orig_image=orig_image, device=device, show=False)
+    image_relevance = show_img_heatmap(R_image[0], img, orig_image=orig_image, device=device)
     overlapped = overlay_relevance_map_on_image(image, image_relevance)
 
-    text_scores, text_tokens_decoded = show_heatmap_on_text(text, text_input, R_text[0], show=False)
+    text_scores, text_tokens_decoded = show_heatmap_on_text(text, text_input, R_text[0])
 
     highlighted_text = []
     for i, token in enumerate(text_tokens_decoded):
