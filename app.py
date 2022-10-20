@@ -191,7 +191,6 @@ iface_NER = gr.Interface(fn=NER_demo,
                          outputs=outputs_NER,
                          title="Named Entity Grounding explainability using CLIP",
                          description=description_NER,
-                         cache_examples=False,
                          examples=[
                              ["example_images/London.png", "In this image we see Big Ben and the London Eye, on both sides of the river Thames."],
                              ["example_images/harrypotter.png", "Hermione, Harry and Ron in their school uniform"],
