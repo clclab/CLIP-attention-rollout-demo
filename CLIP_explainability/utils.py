@@ -13,13 +13,13 @@ _tokenizer = _Tokenizer()
 
 #@title Control context expansion (number of attention layers to consider)
 #@title Number of layers for image Transformer
-start_layer =  11#@param {type:"number"}
+#start_layer =  11#@param {type:"number"}
 
 #@title Number of layers for text Transformer
 start_layer_text =  11#@param {type:"number"}
 
 
-def interpret(image, texts, model, device):
+def interpret(image, texts, model, device, start_layer):
     batch_size = texts.shape[0]
     images = image.repeat(batch_size, 1, 1, 1)
     logits_per_image, logits_per_text = model(images, texts)

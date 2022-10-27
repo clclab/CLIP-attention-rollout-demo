@@ -53,21 +53,29 @@ import en_core_web_sm
 nlp = en_core_web_sm.load()
 
 # Gradio Section:
+def update_slider(model):
+    if model == "ViT-L/14":
+        return gr.update(maximum=23, value=23)
+    else:
+        return gr.update(maximum=11, value=11)
+
 def run_demo(*args):
-    if len(args) == 3:
-        image, text, model_name = args
+    if len(args) == 4:
+        image, text, model_name, vision_layer = args
     elif len(args) == 2:
         image, text = args
         model_name = "ViT-B/32"
+        vision_layer = 11
     else:
         raise ValueError("Unexpected number of parameters")
 
+    vision_layer = int(vision_layer)
     model, preprocess = clip.load(model_name, device=device, jit=False)
     orig_image = pad_to_square(image)
     img = preprocess(orig_image).unsqueeze(0).to(device)
     text_input = clip.tokenize([text]).to(device)
 
-    R_text, R_image = interpret(model=model, image=img, texts=text_input, device=device)
+    R_text, R_image = interpret(model=model, image=img, texts=text_input, device=device, start_layer=vision_layer)
 
     image_relevance = show_img_heatmap(R_image[0], img, orig_image=orig_image, device=device)
     overlapped = overlay_relevance_map_on_image(image, image_relevance)
@@ -83,18 +91,6 @@ def run_demo(*args):
 
 # Default demo:
 
-default_inputs = [
-        gr.components.Image(type='pil', label="Original Image"),
-        gr.components.Textbox(label="Image description"),
-        gr.Dropdown(label="CLIP Model", choices=['ViT-B/16', 'ViT-B/32', 'ViT-L/14'], value="ViT-B/32"),
-    ]
-
-default_outputs = [
-        gr.components.Image(type='pil', label="Output Image"),
-        gr.components.HighlightedText(label="Text importance"),
-    ]
-
-
 description = """This demo is a copy of the demo CLIPGroundingExlainability built by Paul Hilders, Danilo de Goede and Piyush Bagad, as part of the course Interpretability and Explainability in AI (MSc AI, UvA, June 2022).
 <br> <br>
                  This demo shows attributions scores on both the image and the text input when presenting CLIP with a
@@ -104,23 +100,37 @@ description = """This demo is a copy of the demo CLIPGroundingExlainability buil
                  methods such as the one from this demo can only give an estimate of the real underlying behavior
                  of the model."""
 
-iface = gr.Interface(fn=run_demo,
-                     inputs=default_inputs,
-                     outputs=default_outputs,
-                     title="CLIP Grounding Explainability",
-                     description=description,
-                     cache_examples=False,
-                     examples=[["example_images/London.png", "London Eye"],
-                               ["example_images/London.png", "Big Ben"],
-                               ["example_images/harrypotter.png", "Harry"],
-                               ["example_images/harrypotter.png", "Hermione"],
-                               ["example_images/harrypotter.png", "Ron"],
-                               ["example_images/Amsterdam.png", "Amsterdam canal"],
-                               ["example_images/Amsterdam.png", "Old buildings"],
-                               ["example_images/Amsterdam.png", "Pink flowers"],
-                               ["example_images/dogs_on_bed.png", "Two dogs"],
-                               ["example_images/dogs_on_bed.png", "Book"],
-                               ["example_images/dogs_on_bed.png", "Cat"]])
+with gr.Blocks(title="CLIP Grounding Explainability") as iface_default:
+    gr.Markdown(description)
+    with gr.Row():
+        with gr.Column() as inputs:
+            orig = gr.components.Image(type='pil', label="Original Image")
+            description = gr.components.Textbox(label="Image description")
+            default_model = gr.Dropdown(label="CLIP Model", choices=['ViT-B/16', 'ViT-B/32', 'ViT-L/14'], value="ViT-B/32")
+            default_layer = gr.Slider(label="Vision start layer", minimum=0, maximum=11, step=1, value=11)
+            submit = gr.Button("Submit")
+        with gr.Column() as outputs:
+            image = gr.components.Image(type='pil', label="Output Image")
+            text = gr.components.HighlightedText(label="Text importance")
+    gr.Examples(
+            examples=[
+                    ["example_images/London.png", "London Eye"],
+                    ["example_images/London.png", "Big Ben"],
+                    ["example_images/harrypotter.png", "Harry"],
+                    ["example_images/harrypotter.png", "Hermione"],
+                    ["example_images/harrypotter.png", "Ron"],
+                    ["example_images/Amsterdam.png", "Amsterdam canal"],
+                    ["example_images/Amsterdam.png", "Old buildings"],
+                    ["example_images/Amsterdam.png", "Pink flowers"],
+                    ["example_images/dogs_on_bed.png", "Two dogs"],
+                    ["example_images/dogs_on_bed.png", "Book"],
+                    ["example_images/dogs_on_bed.png", "Cat"]
+                ],
+            inputs=[orig, description]
+        )
+    default_model.change(update_slider, inputs=default_model, outputs=default_layer)
+    submit.click(run_demo, inputs=[orig, description, default_model, default_layer], outputs=[image, text])
+
 
 # NER demo:
 def add_label_to_img(img, label, add_entity_label=True):
@@ -170,36 +180,36 @@ def NER_demo(image, text, model_name):
 
     return labeled_text, gallery_images
 
-inputs_NER = [
-        gr.Image(type='pil', label="Original Image"),
-        gr.components.Textbox(label="Descriptive text"),
-        gr.Dropdown(label="CLIP Model", choices=['ViT-B/16', 'ViT-B/32', 'ViT-L/14'], value="ViT-L/14"),
-    ]
-
-#colours = highlighter._style["color_map"]
-outputs_NER = [
-        gr.components.HighlightedText(show_legend=True, color_map=colour_map, label="Noun chunks"),
-        gr.components.Gallery(type='pil', label="NER Entity explanations")
-    ]
 
 description_NER = """Automatically generated CLIP grounding explanations for
-                     named entities, retrieved from the spacy NER model. <span style="color:red">Warning:</span> Note
+                     noun chunks, retrieved with the spaCy model. <span style="color:red">Warning:</span> Note
                      that attribution methods such as the one from this demo can only give an estimate of the real
                      underlying behavior of the model."""
 
-iface_NER = gr.Interface(fn=NER_demo,
-                         inputs=inputs_NER,
-                         outputs=outputs_NER,
-                         title="Named Entity Grounding explainability using CLIP",
-                         description=description_NER,
-                         examples=[
-                             ["example_images/London.png", "In this image we see Big Ben and the London Eye, on both sides of the river Thames."],
-                             ["example_images/harrypotter.png", "Hermione, Harry and Ron in their school uniform"],
-                             ],
-                         cache_examples=False)
+with gr.Blocks(title="Entity Grounding explainability using CLIP") as iface_NER:
+    gr.Markdown(description_NER)
+    with gr.Row():
+        with gr.Column() as inputs:
+            img = gr.Image(type='pil', label="Original Image")
+            text = gr.components.Textbox(label="Descriptive text")
+            ner_model = gr.Dropdown(label="CLIP Model", choices=['ViT-B/16', 'ViT-B/32', 'ViT-L/14'], value="ViT-B/32")
+            ner_layer = gr.Slider(label="Vision start layer", minimum=0, maximum=11, step=1, value=11)
+            submit = gr.Button("Submit")
+        with gr.Column() as outputs:
+            text = gr.components.HighlightedText(show_legend=True, color_map=colour_map, label="Noun chunks")
+            gallery = gr.components.Gallery(type='pil', label="NER Entity explanations")
 
-demo_tabs = gr.TabbedInterface([iface, iface_NER], ["Default", "NER"])
+    gr.Examples(
+            examples=[
+                    ["example_images/London.png", "In this image we see Big Ben and the London Eye, on both sides of the river Thames."],
+                    ["example_images/harrypotter.png", "Hermione, Harry and Ron in their school uniform"],
+                ],
+            inputs=[img, text],
+        )
+    ner_model.change(update_slider, inputs=ner_model, outputs=ner_layer)
+    submit.click(run_demo, inputs=[img, text, ner_model, ner_layer], outputs=[text, gallery])
 
+demo_tabs = gr.TabbedInterface([iface_default, iface_NER], ["Default", "Entities"])
 with demo_tabs:
     gr.Markdown("""
                 ### Acknowledgements
