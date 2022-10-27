@@ -191,7 +191,7 @@ with gr.Blocks(title="Entity Grounding explainability using CLIP") as iface_NER:
     with gr.Row():
         with gr.Column() as inputs:
             img = gr.Image(type='pil', label="Original Image")
-            text = gr.components.Textbox(label="Descriptive text")
+            intext = gr.components.Textbox(label="Descriptive text")
             ner_model = gr.Dropdown(label="CLIP Model", choices=['ViT-B/16', 'ViT-B/32', 'ViT-L/14'], value="ViT-B/32")
             ner_layer = gr.Slider(label="Vision start layer", minimum=0, maximum=11, step=1, value=11)
             submit = gr.Button("Submit")
@@ -207,7 +207,7 @@ with gr.Blocks(title="Entity Grounding explainability using CLIP") as iface_NER:
             inputs=[img, text],
         )
     ner_model.change(update_slider, inputs=ner_model, outputs=ner_layer)
-    submit.click(run_demo, inputs=[img, text, ner_model, ner_layer], outputs=[text, gallery])
+    submit.click(run_demo, inputs=[img, intext, ner_model, ner_layer], outputs=[text, gallery])
 
 demo_tabs = gr.TabbedInterface([iface_default, iface_NER], ["Default", "Entities"])
 with demo_tabs:
