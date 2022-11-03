@@ -1,8 +1,9 @@
 import re
 import sys
+import pathlib
+import csv
 import gradio as gr
 
-# sys.path.append("../")
 sys.path.append("CLIP_explainability/Transformer-MM-Explainability/")
 
 import torch
@@ -23,6 +24,12 @@ clip.clip._MODELS = {
     "ViT-L/14": "https://openaipublic.azureedge.net/clip/models/b8cca3fd41ae0c99ba7e8951adf17d267cdb84cd88be6f7c2e0eca1737a03836/ViT-L-14.pt",
     "ViT-L/14@336px": "https://openaipublic.azureedge.net/clip/models/3035c92b350959924f9f00213499208652fc7ea050643e8b385c2dac08641f02/ViT-L-14-336px.pt",
 }
+
+def iter_file(filename):
+    with pathlib.Path(filename).open("r") as fh:
+        header = next(fh)
+        for line in fh:
+            yield line
 
 colour_map = {
         "N": "#f77189",
@@ -91,17 +98,9 @@ def run_demo(*args):
 
 # Default demo:
 
-description = """This demo is a copy of the demo CLIPGroundingExlainability built by Paul Hilders, Danilo de Goede and Piyush Bagad, as part of the course Interpretability and Explainability in AI (MSc AI, UvA, June 2022).
-<br> <br>
-                 This demo shows attributions scores on both the image and the text input when presenting CLIP with a
-                 <text,image> pair. Attributions are computed as Gradient-weighted Attention Rollout (Chefer et al.,
-                 2021), and can be thought of as an estimate of the effective attention CLIP pays to its input when
-                 computing a multimodal representation. <span style="color:red">Warning:</span> Note that attribution
-                 methods such as the one from this demo can only give an estimate of the real underlying behavior
-                 of the model."""
-
+examples = list(csv.reader(iter_file("examples.csv")))
 with gr.Blocks(title="CLIP Grounding Explainability") as iface_default:
-    gr.Markdown(description)
+    gr.Markdown(pathlib.Path("description.md").read_text)
     with gr.Row():
         with gr.Column() as inputs:
             orig = gr.components.Image(type='pil', label="Original Image")
@@ -112,22 +111,7 @@ with gr.Blocks(title="CLIP Grounding Explainability") as iface_default:
         with gr.Column() as outputs:
             image = gr.components.Image(type='pil', label="Output Image")
             text = gr.components.HighlightedText(label="Text importance")
-    gr.Examples(
-            examples=[
-                    ["example_images/London.png", "London Eye"],
-                    ["example_images/London.png", "Big Ben"],
-                    ["example_images/harrypotter.png", "Harry"],
-                    ["example_images/harrypotter.png", "Hermione"],
-                    ["example_images/harrypotter.png", "Ron"],
-                    ["example_images/Amsterdam.png", "Amsterdam canal"],
-                    ["example_images/Amsterdam.png", "Old buildings"],
-                    ["example_images/Amsterdam.png", "Pink flowers"],
-                    ["example_images/dogs_on_bed.png", "Two dogs"],
-                    ["example_images/dogs_on_bed.png", "Book"],
-                    ["example_images/dogs_on_bed.png", "Cat"]
-                ],
-            inputs=[orig, description]
-        )
+    gr.Examples(examples=examples, inputs=[orig, description])
     default_model.change(update_slider, inputs=default_model, outputs=default_layer)
     submit.click(run_demo, inputs=[orig, description, default_model, default_layer], outputs=[image, text])
 
@@ -181,13 +165,9 @@ def NER_demo(image, text, model_name):
     return labeled_text, gallery_images
 
 
-description_NER = """Automatically generated CLIP grounding explanations for
-                     noun chunks, retrieved with the spaCy model. <span style="color:red">Warning:</span> Note
-                     that attribution methods such as the one from this demo can only give an estimate of the real
-                     underlying behavior of the model."""
-
+entity_examples = list(csv.reader(iter_file("entity_examples.csv")))
 with gr.Blocks(title="Entity Grounding explainability using CLIP") as iface_NER:
-    gr.Markdown(description_NER)
+    gr.Markdown(pathlib.Path("entity_description.md").read_text)
     with gr.Row():
         with gr.Column() as inputs:
             img = gr.Image(type='pil', label="Original Image")
@@ -199,28 +179,11 @@ with gr.Blocks(title="Entity Grounding explainability using CLIP") as iface_NER:
             text = gr.components.HighlightedText(show_legend=True, color_map=colour_map, label="Noun chunks")
             gallery = gr.components.Gallery(type='pil', label="NER Entity explanations")
 
-    gr.Examples(
-            examples=[
-                    ["example_images/London.png", "In this image we see Big Ben and the London Eye, on both sides of the river Thames."],
-                    ["example_images/harrypotter.png", "Hermione, Harry and Ron in their school uniform"],
-                ],
-            inputs=[img, text],
-        )
+    gr.Examples(examples=entity_examples, inputs=[img, text])
     ner_model.change(update_slider, inputs=ner_model, outputs=ner_layer)
     submit.click(run_demo, inputs=[img, intext, ner_model, ner_layer], outputs=[text, gallery])
 
 demo_tabs = gr.TabbedInterface([iface_default, iface_NER], ["Default", "Entities"])
 with demo_tabs:
-    gr.Markdown("""
-                ### Acknowledgements
-                This demo was developed for the Interpretability & Explainability in AI course at the University of
-                Amsterdam. We would like to express our thanks to Jelle Zuidema, Jaap Jumelet, Tom Kersten, Christos
-                Athanasiadis, Peter Heemskerk, Zhi Zhang, and all the other TAs who helped us during this course.
-
-                ---
-                ### References
-                \[1\]: Chefer, H., Gur, S., & Wolf, L. (2021). Generic attention-model explainability for interpreting bi-modal and encoder-decoder transformers. <br>
-                \[2\]: Abnar, S., & Zuidema, W. (2020). Quantifying attention flow in transformers. arXiv preprint arXiv:2005.00928. <br>
-                \[3\]: [https://samiraabnar.github.io/articles/2020-04/attention_flow](https://samiraabnar.github.io/articles/2020-04/attention_flow) <br>
-                """)
+    gr.Markdown(pathlib.Path("footer.md").read_text)
 demo_tabs.launch(show_error=True)
