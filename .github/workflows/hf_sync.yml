@@ -16,4 +16,4 @@ jobs:
       - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push https://njitram:$HF_TOKEN@huggingface.co/spaces/amsterdamNLP/IEAI_CLIPGroundingExplainability main
+        run: git push https://njitram:$HF_TOKEN@huggingface.co/spaces/amsterdamNLP/CLIP-attention-rollout main
